@@ -1,2 +1,2 @@
 # EcoQuest
-Un video juego.
+Un videojuego.
