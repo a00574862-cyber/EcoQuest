@@ -1,0 +1,72 @@
+import tkinter as tk
+from tkinter import ttk
+from app.win_home import open_win_home
+from app.win_form import open_win_form
+from app.win_list import open_win_list
+from app.win_table import open_win_table
+from app.win_canvas import open_win_canvas
+
+def main():
+    root = tk.Tk()
+    root.title("Proyecto Integrador - MVP")
+    root.configure(bg="#145A32")  # Fondo verde oscuro tipo pizarrón
+    root.state('zoomed')  # Pantalla completa
+
+    font_title = ("Comic Sans MS", 28, "bold")
+    font_btn = ("Comic Sans MS", 16)
+    font_a_jugar = ("Comic Sans MS", 24, "bold")
+    white = "#FFFFFF"
+
+    frame = tk.Frame(root, bg="#145A32")
+    frame.pack(fill="both", expand=True)
+
+    # Título principal
+    label_title = tk.Label(frame, text="4MathsLife", font=font_title, bg="#145A32", fg=white)
+    label_title.place(relx=0.5, rely=0.12, anchor="center")
+
+    # Estilo unificado de botones
+    btn_style = {
+        "bg": "black",
+        "fg": white,
+        "font": font_btn,
+        "activebackground": "#333333",
+        "activeforeground": white,
+        "bd": 2,
+        "relief": "solid",
+        "highlightthickness": 2,
+        "highlightbackground": white,
+        "highlightcolor": white,
+        "width": 13,
+        "height": 2,
+        "cursor": "hand2"
+    }
+
+    # Botón Inicio (centrado debajo del título)
+    btn_inicio = tk.Button(frame, text="Inicio", command=lambda: open_win_home(root), **btn_style)
+    btn_inicio.place(relx=0.5, rely=0.23, anchor="center")
+
+    # Botones Cuenta y Ajustes (en los lados debajo del Inicio, tipo pirámide)
+    btn_cuenta = tk.Button(frame, text="Cuenta @", command=lambda: open_win_form(root), **btn_style)
+    btn_cuenta.place(relx=0.32, rely=0.32, anchor="center")
+
+    btn_ajustes = tk.Button(frame, text="Ajustes @", command=lambda: open_win_list(root), **btn_style)
+    btn_ajustes.place(relx=0.68, rely=0.32, anchor="center")
+
+    # Texto ¡A jugar! (centrado hacia abajo)
+    label_a_jugar = tk.Label(frame, text="¡A jugar!", font=font_a_jugar, bg="#145A32", fg=white)
+    label_a_jugar.place(relx=0.5, rely=0.48, anchor="center")
+
+    # Botones de nivel alineados abajo y centrados
+    btn_n1 = tk.Button(frame, text="N1", command=lambda: open_win_table(root), **btn_style)
+    btn_n1.place(relx=0.33, rely=0.61, anchor="center")
+
+    btn_n2 = tk.Button(frame, text="N2", command=lambda: open_win_canvas(root), **btn_style)
+    btn_n2.place(relx=0.5, rely=0.61, anchor="center")
+
+    btn_n3 = tk.Button(frame, text="N3", **btn_style)
+    btn_n3.place(relx=0.67, rely=0.61, anchor="center")
+
+    root.mainloop()
+
+if _name_ == "_main_":
+    main()
