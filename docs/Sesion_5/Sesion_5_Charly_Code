@@ -1,0 +1,16 @@
+import tkinter as tk
+from tkinter import ttk, messagebox
+
+def open_win_home(parent: tk.Tk):
+    win = tk.Toplevel(parent)
+    win.title("Home / Bienvenida")
+    win.geometry("360x220")
+    frm = ttk.Frame(win, padding=16)
+    frm.pack(fill="both", expand=True)
+
+    ttk.Label(frm, text="¡Bienvenidos a 4MathsLife ", font=("Segoe UI", 20, "bold")).pack(pady=(0, 8))
+    ttk.Label(frm, text="La primera página de FullFocus Learning para Matemáticas").pack(pady=(0, 12))
+    ttk.Label(frm, text="Explora las ventanas desde la pantalla principal.").pack(pady=(0, 16))
+    ttk.Button(frm, text="TIP PARA EMPEZAR",
+               command=lambda: messagebox.showinfo("Info", "El no puedo es para la gente que no puede, pero como tú si puedes, dale.")).pack()
+    ttk.Button(frm, text="Cerrar", command=win.destroy).pack(pady=8)
