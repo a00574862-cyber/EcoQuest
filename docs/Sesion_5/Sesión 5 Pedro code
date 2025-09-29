@@ -1,0 +1,32 @@
+import tkinter as tk
+
+# Crear ventana principal
+ventana = tk.Tk()
+ventana.title("Problema Matemático")
+ventana.geometry("400x300")
+
+# Pregunta
+pregunta = tk.Label(ventana, text="¿Cuánto es 5 - 2?", font=("Arial", 14))
+pregunta.pack(pady=20)
+
+# Frame para organizar los botones en cuadrícula
+frame_botones = tk.Frame(ventana)
+frame_botones.pack()
+
+# Función para comprobar respuesta
+def verificar(respuesta):
+    nueva_ventana = tk.Toplevel(ventana)
+    nueva_ventana.title("Resultado")
+    if respuesta == 3:
+        tk.Label(nueva_ventana, text="¡Respuesta correcta!", fg="green", font=("Arial", 14)).pack(pady=30)
+    else:
+        tk.Label(nueva_ventana, text="Respuesta incorrecta.", fg="red", font=("Arial", 14)).pack(pady=30)
+
+# Botones en 2x2
+tk.Button(frame_botones, text="1", width=10, height=2, command=lambda: verificar(1)).grid(row=0, column=0, padx=10, pady=10)
+tk.Button(frame_botones, text="2", width=10, height=2, command=lambda: verificar(2)).grid(row=0, column=1, padx=10, pady=10)
+tk.Button(frame_botones, text="3", width=10, height=2, command=lambda: verificar(3)).grid(row=1, column=0, padx=10, pady=10)  # Correcta
+tk.Button(frame_botones, text="4", width=10, height=2, command=lambda: verificar(4)).grid(row=1, column=1, padx=10, pady=10)
+
+# Iniciar programa
+ventana.mainloop()
