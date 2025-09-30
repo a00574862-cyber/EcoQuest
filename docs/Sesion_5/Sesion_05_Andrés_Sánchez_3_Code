@@ -1,0 +1,216 @@
+# -*- coding: utf-8 -*-
+"""
+Nivel 1 - Quiz de Matemáticas para niños (Tkinter)
+Autor: ChatGPT
+Descripción:
+- 10 preguntas de opción múltiple (4 opciones) tipo aritmética básica.
+- Interfaz amigable con botones grandes.
+- Mensajes de refuerzo positivo al acertar o fallar.
+- Avanza automáticamente hasta terminar el nivel y muestra un resumen con puntaje.
+- Listo para ejecutarse en Python 3.x con Tkinter estándar.
+"""
+
+import tkinter as tk
+from tkinter import messagebox
+import random
+
+PREGUNTAS_NIVEL_2 = [
+    {"pregunta": "¿Cuánto es 4 + 4?",
+     "opciones": ["6", "8", "10", "9"],
+     "correcta": 1},
+    {"pregunta": "¿Cuánto es 3 + 5?",
+     "opciones": ["7", "8", "6", "9"],
+     "correcta": 1},
+    {"pregunta": "¿Cuánto es 2 + 7?",
+        "opciones": ["10", "8", "9", "7"],
+        "correcta": 2},
+    {"pregunta": "¿Cuánto es 6 + 1?",
+     "opciones": ["7", "8", "6", "5"],
+     "correcta": 0},
+    {"pregunta": "¿Cuánto es 5 + 4?",
+     "opciones": ["10", "8", "9", "7"],
+     "correcta": 2},
+    {"pregunta": "¿Cuánto es 1 + 1?",
+     "opciones": ["0", "1", "2", "3"],
+     "correcta": 2},
+    {"pregunta": "¿Cuánto es 2 + 3?",
+     "opciones": ["4", "5", "6", "3"],
+     "correcta": 1},
+    {"pregunta": "¿Cuánto es 7 + 2?",
+     "opciones": ["8", "9", "10", "11"],
+     "correcta": 1},
+    {"pregunta": "¿Cuánto es 10 - 6?",
+     "opciones": ["6", "3", "4", "5"],
+     "correcta": 2},
+    {"pregunta": "¿Cuánto es 9 - 4?",
+     "opciones": ["5", "4", "6", "3"],
+     "correcta": 0},
+]
+
+MENSAJES_ACIERTO = [
+    "¡Bien hecho! 🎉",
+    "¡Excelente! 🌟",
+    "¡Súper! ✅",
+    "¡Lo estás haciendo increíble! 💪"
+]
+
+MENSAJES_ERROR = [
+    "¡Casi! Tú puedes, inténtalo con la siguiente 💡",
+    "No pasa nada, sigue intentando. 💫",
+    "¡Ánimo! Cada intento te hace mejor. 🌈",
+    "Buen esfuerzo, la siguiente saldrá mejor. 🚀"
+]
+
+class QuizApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Nivel 2 - Matemáticas para Niños")
+        self.root.geometry("700x450")
+        self.root.configure(bg="#F7FBFF")
+
+        # Estado del juego
+        self.preguntas = PREGUNTAS_NIVEL_2.copy()
+        random.shuffle(self.preguntas)  # Mezcla el orden de preguntas
+        self.indice = 0
+        self.puntaje = 0
+        self.total = len(self.preguntas)
+
+        # Encabezado
+        self.header = tk.Frame(self.root, bg="#E3F2FD", padx=16, pady=12)
+        self.header.pack(fill="x")
+        self.titulo = tk.Label(self.header, text="Nivel 2: Sumas y Restas Básicas",
+                               font=("Comic Sans MS", 20, "bold"),
+                               bg="#E3F2FD", fg="#0D47A1")
+        self.titulo.pack(side="left")
+
+        self.progreso_lbl = tk.Label(self.header, text=f"Pregunta 1 de {self.total}",
+                                     font=("Arial", 12, "bold"), bg="#E3F2FD", fg="#0D47A1")
+        self.progreso_lbl.pack(side="right")
+
+        # Área de pregunta
+        self.body = tk.Frame(self.root, bg="#F7FBFF", padx=16, pady=16)
+        self.body.pack(expand=True, fill="both")
+
+        self.pregunta_lbl = tk.Label(self.body, text="",
+                                     font=("Comic Sans MS", 22, "bold"),
+                                     bg="#F7FBFF", fg="#1B5E20", wraplength=640, justify="center")
+        self.pregunta_lbl.pack(pady=(10, 20))
+
+        # Contenedor de botones de opciones
+        self.btns_frame = tk.Frame(self.body, bg="#F7FBFF")
+        self.btns_frame.pack()
+
+        self.btns = []
+        for i in range(4):
+            btn = tk.Button(
+                self.btns_frame,
+                text=f"Opción {i+1}",
+                font=("Arial", 16, "bold"),
+                bg="#FFFFFF",
+                fg="#0D47A1",
+                activebackground="#BBDEFB",
+                activeforeground="#0D47A1",
+                relief="raised",
+                bd=3,
+                width=20,
+                height=2,
+                command=lambda idx=i: self.validar_respuesta(idx)
+            )
+            btn.grid(row=i // 2, column=i % 2, padx=12, pady=12, sticky="nsew")
+            self.btns.append(btn)
+
+        # Pie con puntaje
+        self.footer = tk.Frame(self.root, bg="#E3F2FD", padx=16, pady=10)
+        self.footer.pack(fill="x")
+        self.puntaje_lbl = tk.Label(self.footer, text="Puntaje: 0",
+                                    font=("Arial", 12, "bold"),
+                                    bg="#E3F2FD", fg="#0D47A1")
+        self.puntaje_lbl.pack(side="left")
+
+        self.btn_reiniciar = tk.Button(self.footer, text="Reiniciar nivel",
+                                       font=("Arial", 12, "bold"),
+                                       bg="#FFFFFF", fg="#0D47A1", bd=2,
+                                       command=self.reiniciar)
+        self.btn_reiniciar.pack(side="right")
+
+        # Cargar la primera pregunta
+        self.cargar_pregunta()
+
+    def cargar_pregunta(self):
+        if self.indice >= self.total:
+            self.finalizar()
+            return
+
+        item = self.preguntas[self.indice]
+
+       
+        opciones = list(enumerate(item["opciones"]))  # [(idx, texto)]
+        random.shuffle(opciones)
+
+        # Guardamos el mapeo para saber cuál es la correcta tras mezclar
+        self.opciones_actuales = opciones
+        self.indice_correcto_barajado = None
+        for pos, (idx_original, texto) in enumerate(opciones):
+            self.btns[pos]["text"] = texto
+            self.btns[pos]["state"] = "normal"
+            if idx_original == item["correcta"]:
+                self.indice_correcto_barajado = pos
+
+        self.pregunta_lbl.config(text=item["pregunta"])
+        self.progreso_lbl.config(text=f"Pregunta {self.indice + 1} de {self.total}")
+
+    def validar_respuesta(self, idx_seleccionado: int):
+        es_correcta = (idx_seleccionado == self.indice_correcto_barajado)
+        # Deshabilitar botones para evitar múltiples clics
+        for b in self.btns:
+            b["state"] = "disabled"
+
+        if es_correcta:
+            self.puntaje += 1
+            mensaje = random.choice(MENSAJES_ACIERTO)
+            messagebox.showinfo("¡Correcto!", mensaje)
+        else:
+            mensaje = random.choice(MENSAJES_ERROR)
+            # Mostrar también la respuesta correcta (texto)
+            item = self.preguntas[self.indice]
+            respuesta_correcta_texto = item["opciones"][item["correcta"]]
+            messagebox.showwarning("Sigue intentando",
+                                   f"{mensaje}\n\nRespuesta correcta: {respuesta_correcta_texto}")
+
+        self.puntaje_lbl.config(text=f"Puntaje: {self.puntaje}")
+        self.indice += 1
+        self.root.after(200, self.cargar_pregunta)  # pequeño delay para UX
+
+    def finalizar(self):
+        for b in self.btns:
+            b["state"] = "disabled"
+        porcentaje = int((self.puntaje / self.total) * 100)
+        if self.puntaje >= 8:
+            texto = (f"¡Nivel completado! 🎉\n"
+                     f"Tu puntaje: {self.puntaje}/{self.total} ({porcentaje}%)\n"
+                     "¡Excelente trabajo! Puedes pasar al siguiente nivel cuando quieras.")
+        else:
+            texto = (f"¡Buen intento! 🌟\n"
+                     f"Tu puntaje: {self.puntaje}/{self.total} ({porcentaje}%)\n"
+                     "Sigue practicando y mejorarás cada vez más. ¡Tú puedes! 💪")
+        messagebox.showinfo("Resumen del nivel", texto)
+
+    def reiniciar(self):
+        self.preguntas = PREGUNTAS_NIVEL_1.copy()
+        random.shuffle(self.preguntas)
+        self.indice = 0
+        self.puntaje = 0
+        self.puntaje_lbl.config(text="Puntaje: 0")
+        for b in self.btns:
+            b["state"] = "normal"
+        self.cargar_pregunta()
+
+
+def main():
+    root = tk.Tk()
+    app = QuizApp(root)
+    root.mainloop()
+
+
+if __name__ == "__main__":
+    main()
